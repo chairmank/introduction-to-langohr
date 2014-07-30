@@ -14,11 +14,56 @@ for RabbitMQ.
 
 # Usage
 
+## Hello world
+
     lein run -m introduction-to-langohr.hello-world
 
 This example demonstrates messaging from a producer to a consumer via
 RabbitMQ. Messaging events are carefully logged so that you can watch
 the logs and compare with the code to understand what is going on.
+
+## Task queue
+
+    lein run -m introduction-to-langohr.queue
+
+This example is a HTTP service that listens on port 8080 by default.
+(The HTTP port can be configured with a command-line option.)
+
+Make a POST request to compute `(apply + [0 1 2 3 4 5])`. The
+request body must be serialized as EDN:
+
+    $ curl -i -X POST http://localhost:8080/compute -d '[0 1 2 3 4 5]'
+    HTTP/1.1 202 Accepted
+    Date: Wed, 30 Jul 2014 14:05:21 GMT
+    Content-Length: 44
+    Server: Jetty(7.6.13.v20130916)
+    
+    /result/3e60c036-d510-4f4e-af09-499f5a8a13cc
+
+The service will return this HTTP response immediately. The response
+body is the path where the result will become available. Watch the logs
+to trace the cascade of messages as the original HTTP request triggers a
+pipeline of computation tasks.
+
+Make a GET request with the path that you received in the HTTP response:
+
+    $ curl -i -X GET http://localhost:8080/result/57d36896-dc13-475e-9536-b2ae87b285d7
+    HTTP/1.1 404 Not Found
+    Date: Wed, 30 Jul 2014 14:07:42 GMT
+    Content-Length: 63
+    Server: Jetty(7.6.13.v20130916)
+    
+    Result not found
+
+Oops! The result wasn't ready yet. Try again later:
+
+    $ curl -i -X GET http://localhost:8080/result/57d36896-dc13-475e-9536-b2ae87b285d7
+    HTTP/1.1 200 OK
+    Date: Wed, 30 Jul 2014 14:07:58 GMT
+    Content-Length: 2
+    Server: Jetty(7.6.13.v20130916)
+    
+    15
 
 # Credits
 
