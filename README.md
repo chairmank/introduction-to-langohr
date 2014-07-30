@@ -65,6 +65,21 @@ Oops! The result wasn't ready yet. Try again later:
     
     15
 
+## Pub-sub
+
+Start publishers:
+
+    lein run -m introduction-to-langohr.pub-sub.publisher
+
+Start 2 subscribers with binding keys `"*.square"` and `"#"`:
+
+    lein run -m introduction-to-langohr.pub-sub.subscriber '*.square' '#'
+
+This example demonstrates messaging from multiple producers to multiple
+consumers via a topic exchange. Each consumer creates, binds, and
+subscribes to its own queue. Published messages are routed by these
+bindings.
+
 # Credits
 
 This project builds upon excellent documentation and code examples for
